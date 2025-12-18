@@ -2,6 +2,49 @@
 
 Projekt demonstracyjny FastAPI z bazą danych PostgreSQL uruchamiany za pomocą Docker Compose.
 
+### Database Access
+
+The application uses a PostgreSQL database. You can manage it using the included pgAdmin instance.
+
+-   **pgAdmin URL:** [http://localhost:5050/pgadmin](http://localhost:5050/pgadmin)
+-   **pgAdmin Login:**
+    -   Email: `admin@admin.com`
+    -   Password: `admin`
+
+**Database Credentials:**
+
+-   **Host:** `postgres`
+-   **Port:** `5432`
+-   **Database Name:** `carserv`
+-   **Application User:** `user` / `password`
+-   **Admin User:** `admin` / `admin`
+
+The database connection in pgAdmin is automatically configured as "CarServ DB".
+
+## API Usage
+
+The API is accessible at [http://localhost:8000](http://localhost:8000). Documentation (Swagger UI) is available at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+**Available Key Endpoints:**
+
+-   `GET /users`: List all users.
+-   `GET /pages`: List all pages.
+-   `GET /content`: List all content items.
+
+**Authentication:**
+-   Username: `admin`
+-   Password: `admin`
+
+### Resetting the Database
+
+If you need to reset the database (e.g., to apply a new schema from `init.sql`), use the `clean_start` command. **WARNING: This will delete all data in the database.**
+
+```bash
+./run.bat clean_start
+```
+
+This command removes the Docker volumes associated with the project and then rebuilds and starts the containers.
+
 ## Stos Technologiczny i Wersje
 
 **Środowisko:**
@@ -32,9 +75,8 @@ postgresql://user:password@localhost:5432/carserv
 ## Uruchomienie
 
 Użyj skryptu `run.bat`:
-1. `run.bat build_project` - budowanie kontenerów
-2. `run.bat start_project` - uruchomienie aplikacji
-3. `run.bat stop_project` - zatrzymanie aplikacji
+1. `run.bat build_start` - budowanie i startowanie kontenerów
+3. `run.bat stop` - zatrzymanie aplikacji
 
 Aplikacja będzie dostępna pod adresem: http://localhost:8000
 Dokumentacja Swagger UI: http://localhost:8000/docs
