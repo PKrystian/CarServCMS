@@ -19,6 +19,7 @@ CREATE TABLE users (
 -- Create Settings table
 CREATE TABLE settings (
     id BIGSERIAL PRIMARY KEY,
+    reference_key VARCHAR(255) NOT NULL,
     hash TEXT NOT NULL,
     added_by BIGINT REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
