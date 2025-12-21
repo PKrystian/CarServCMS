@@ -23,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+app/src/__pycache__/
+app/src/**/*.pyc
