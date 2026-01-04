@@ -46,6 +46,7 @@ class Page(Base):
     __tablename__ = "pages"
     id = Column(BigInteger, primary_key=True, index=True)
     name = Column(String(150), nullable=False)
+    slug = Column(String(150), nullable=False, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     added_by = Column(BigInteger, ForeignKey("users.id"))
     modified_by = Column(BigInteger, ForeignKey("users.id"))
@@ -79,9 +80,11 @@ class Translation(Base):
 
 class PageCreate(BaseModel):
     name: str
+    slug: str
 
 class PageUpdate(BaseModel):
     name: Optional[str] = None
+    slug: Optional[str] = None
 
 class ContentItemCreate(BaseModel):
     page_id: int
@@ -152,11 +155,20 @@ def get_settings_dict(db: Session):
     settings = db.query(Setting).all()
     return {s.reference_key: s.value for s in settings}
 
-def get_page_content(db: Session, page_name: str):
-    """Get page and its content items"""
-    page = db.query(Page).filter(Page.name == page_name).first()
+def get_all_pages(db: Session):
+    """Get all pages for navigation"""
+    return db.query(Page).order_by(Page.id).all()
+
+def get_page_content(db: Session, page_identifier: str):
+    """Get page and its content items by slug or name"""
+    # Try to find by slug first, then by name
+    page = db.query(Page).filter(Page.slug == page_identifier).first()
+    if not page:
+        page = db.query(Page).filter(Page.name == page_identifier).first()
+
     if not page:
         return None, []
+
     content_items = db.query(ContentItem).filter(
         ContentItem.page_id == page.id
     ).order_by(ContentItem.position).all()
@@ -166,155 +178,80 @@ def get_page_content(db: Session, page_name: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
+    """Homepage route"""
     settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "Home")
+    all_pages = get_all_pages(db)
+    page, content_items = get_page_content(db, "home")
 
-    # Organize content by type
-    content = {
-        'carousel': [],
-        'features': [],
-        'about': {},
-        'about_points': [],
-        'services': [],
-        'booking_info': {}
-    }
+    if not page:
+        raise HTTPException(status_code=404, detail="Homepage not found")
 
+    # Organize content by type for flexibility
+    content = {}
     for item in content_items:
-        if item.content_type == 'carousel':
-            content['carousel'].append(item)
-        elif item.content_type == 'feature':
-            content['features'].append(item)
-        elif item.content_type == 'about':
-            content['about'] = item
-        elif item.content_type == 'about_point':
-            content['about_points'].append(item)
-        elif item.content_type == 'booking_info':
-            content['booking_info'] = item
+        content_type = item.content_type
+        if content_type not in content:
+            content[content_type] = []
+        content[content_type].append(item)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
         "settings": settings,
+        "all_pages": all_pages,
         "page": page,
-        "content": content
+        "content": content,
+        "content_items": content_items
     })
 
-@app.get("/about", response_class=HTMLResponse)
-async def about(request: Request, db: Session = Depends(get_db)):
+@app.get("/page/{slug}", response_class=HTMLResponse)
+async def dynamic_page(slug: str, request: Request, db: Session = Depends(get_db)):
+    """Dynamic route for all pages"""
     settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "About")
+    all_pages = get_all_pages(db)
+    page, content_items = get_page_content(db, slug)
 
-    content = {
-        'header': {},
-        'about': {},
-        'about_points': []
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    # Organize content by type for flexibility
+    content = {}
+    for item in content_items:
+        content_type = item.content_type
+        if content_type not in content:
+            content[content_type] = []
+        content[content_type].append(item)
+
+    # Try to find a specific template for this page, fallback to generic
+    template_map = {
+        'about': 'about.html',
+        'services': 'services.html',
+        'contact': 'contact.html',
+        'team': 'team.html',
+        'testimonials': 'testimonials.html',
     }
 
-    for item in content_items:
-        if item.content_type == 'page_header':
-            content['header'] = item
-        elif item.content_type == 'about':
-            content['about'] = item
-        elif item.content_type == 'about_point':
-            content['about_points'].append(item)
+    template_name = template_map.get(slug, 'generic_page.html')
 
-    return templates.TemplateResponse("about.html", {
-        "request": request,
-        "settings": settings,
-        "page": page,
-        "content": content
-    })
-
-@app.get("/services", response_class=HTMLResponse)
-async def services(request: Request, db: Session = Depends(get_db)):
-    settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "Services")
-
-    content = {
-        'header': {},
-        'services': []
-    }
-
-    for item in content_items:
-        if item.content_type == 'page_header':
-            content['header'] = item
-        elif item.content_type == 'service':
-            content['services'].append(item)
-
-    return templates.TemplateResponse("services.html", {
-        "request": request,
-        "settings": settings,
-        "page": page,
-        "content": content
-    })
-
-@app.get("/contact", response_class=HTMLResponse)
-async def contact(request: Request, db: Session = Depends(get_db)):
-    settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "Contact")
-
-    content = {
-        'header': {},
-        'intro': {}
-    }
-
-    for item in content_items:
-        if item.content_type == 'page_header':
-            content['header'] = item
-        elif item.content_type == 'contact_intro':
-            content['intro'] = item
-
-    return templates.TemplateResponse("contact.html", {
-        "request": request,
-        "settings": settings,
-        "page": page,
-        "content": content
-    })
-
-@app.get("/team", response_class=HTMLResponse)
-async def team(request: Request, db: Session = Depends(get_db)):
-    settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "Team")
-
-    content = {
-        'header': {},
-        'team_members': []
-    }
-
-    for item in content_items:
-        if item.content_type == 'page_header':
-            content['header'] = item
-        elif item.content_type == 'team_member':
-            content['team_members'].append(item)
-
-    return templates.TemplateResponse("team.html", {
-        "request": request,
-        "settings": settings,
-        "page": page,
-        "content": content
-    })
-
-@app.get("/testimonials", response_class=HTMLResponse)
-async def testimonials(request: Request, db: Session = Depends(get_db)):
-    settings = get_settings_dict(db)
-    page, content_items = get_page_content(db, "Testimonials")
-
-    content = {
-        'header': {},
-        'testimonials': []
-    }
-
-    for item in content_items:
-        if item.content_type == 'page_header':
-            content['header'] = item
-        elif item.content_type == 'testimonial':
-            content['testimonials'].append(item)
-
-    return templates.TemplateResponse("testimonials.html", {
-        "request": request,
-        "settings": settings,
-        "page": page,
-        "content": content
-    })
+    # If specific template doesn't exist, use generic
+    try:
+        return templates.TemplateResponse(template_name, {
+            "request": request,
+            "settings": settings,
+            "all_pages": all_pages,
+            "page": page,
+            "content": content,
+            "content_items": content_items
+        })
+    except:
+        # Fallback to generic template
+        return templates.TemplateResponse("generic_page.html", {
+            "request": request,
+            "settings": settings,
+            "all_pages": all_pages,
+            "page": page,
+            "content": content,
+            "content_items": content_items
+        })
 
 # --- Admin Panel Routes ---
 
@@ -386,7 +323,7 @@ def read_page(page_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/pages", dependencies=[Depends(get_admin_user)])
 def create_page(page: PageCreate, user: User = Depends(get_admin_user), db: Session = Depends(get_db)):
-    db_page = Page(name=page.name, added_by=user.id)
+    db_page = Page(name=page.name, slug=page.slug, added_by=user.id)
     db.add(db_page)
     db.commit()
     db.refresh(db_page)
@@ -400,6 +337,8 @@ def update_page(page_id: int, page: PageUpdate, user: User = Depends(get_admin_u
 
     if page.name:
         db_page.name = page.name
+    if page.slug:
+        db_page.slug = page.slug
     db_page.modified_by = user.id
     db_page.modified_at = datetime.utcnow()
 

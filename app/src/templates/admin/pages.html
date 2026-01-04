@@ -16,6 +16,7 @@
                         <tr class="text-white">
                             <th scope="col">ID</th>
                             <th scope="col">Page Name</th>
+                            <th scope="col">Slug (URL)</th>
                             <th scope="col">Created At</th>
                             <th scope="col">Actions</th>
                         </tr>
@@ -25,13 +26,19 @@
                         <tr>
                             <td>{{ page.id }}</td>
                             <td>{{ page.name }}</td>
+                            <td>
+                                <code>{% if page.slug == 'home' %}/{% else %}/page/{{ page.slug }}{% endif %}</code>
+                                <a href="{% if page.slug == 'home' %}/{% else %}/page/{{ page.slug }}{% endif %}" target="_blank" class="btn btn-sm btn-info ms-2">
+                                    <i class="fa fa-external-link-alt"></i> View
+                                </a>
+                            </td>
                             <td>{{ page.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td>
                                 <a class="btn btn-sm btn-primary" href="/admin/pages/{{ page.id }}/edit">
                                     <i class="fa fa-edit"></i> Edit Content
                                 </a>
-                                <button class="btn btn-sm btn-warning" onclick="editPage({{ page.id }}, '{{ page.name }}')">
-                                    <i class="fa fa-pen"></i> Rename
+                                <button class="btn btn-sm btn-warning" onclick="editPage({{ page.id }}, '{{ page.name }}', '{{ page.slug }}')">
+                                    <i class="fa fa-pen"></i> Edit
                                 </button>
                                 <button class="btn btn-sm btn-danger" onclick="deletePage({{ page.id }})">
                                     <i class="fa fa-trash"></i> Delete
@@ -58,7 +65,13 @@
                     <form id="addPageForm">
                         <div class="mb-3">
                             <label for="pageName" class="form-label">Page Name</label>
-                            <input type="text" class="form-control" id="pageName" required>
+                            <input type="text" class="form-control" id="pageName" required onkeyup="generateSlug()">
+                            <small class="form-text text-muted">The display name for your page</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pageSlug" class="form-label">Slug (URL)</label>
+                            <input type="text" class="form-control" id="pageSlug" required pattern="[a-z0-9-]+">
+                            <small class="form-text text-muted">URL-friendly version (lowercase, no spaces). Example: "about-us"</small>
                         </div>
                     </form>
                 </div>
@@ -85,6 +98,11 @@
                             <label for="editPageName" class="form-label">Page Name</label>
                             <input type="text" class="form-control" id="editPageName" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="editPageSlug" class="form-label">Slug (URL)</label>
+                            <input type="text" class="form-control" id="editPageSlug" required pattern="[a-z0-9-]+">
+                            <small class="form-text text-muted">URL-friendly version (lowercase, no spaces)</small>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -98,9 +116,23 @@
 
 {% block extra_js %}
 <script>
+    function generateSlug() {
+        const name = document.getElementById('pageName').value;
+        const slug = name.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+        document.getElementById('pageSlug').value = slug;
+    }
+
     function addPage() {
         const name = document.getElementById('pageName').value;
-        if (!name) return;
+        const slug = document.getElementById('pageSlug').value;
+        if (!name || !slug) {
+            alert('Please fill in all fields');
+            return;
+        }
 
         fetch('/api/pages', {
             method: 'POST',
@@ -108,27 +140,37 @@
                 'Content-Type': 'application/json',
                 'Authorization': 'Basic ' + btoa('admin:admin')
             },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name: name, slug: slug })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
             location.reload();
         })
         .catch(error => {
-            alert('Error adding page: ' + error);
+            alert('Error adding page: ' + (error.detail || 'Unknown error'));
         });
     }
 
-    function editPage(id, name) {
+    function editPage(id, name, slug) {
         document.getElementById('editPageId').value = id;
         document.getElementById('editPageName').value = name;
+        document.getElementById('editPageSlug').value = slug;
         new bootstrap.Modal(document.getElementById('editPageModal')).show();
     }
 
     function updatePage() {
         const id = document.getElementById('editPageId').value;
         const name = document.getElementById('editPageName').value;
-        if (!name) return;
+        const slug = document.getElementById('editPageSlug').value;
+        if (!name || !slug) {
+            alert('Please fill in all fields');
+            return;
+        }
 
         fetch(`/api/pages/${id}`, {
             method: 'PUT',
@@ -136,19 +178,24 @@
                 'Content-Type': 'application/json',
                 'Authorization': 'Basic ' + btoa('admin:admin')
             },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name: name, slug: slug })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
             location.reload();
         })
         .catch(error => {
-            alert('Error updating page: ' + error);
+            alert('Error updating page: ' + (error.detail || 'Unknown error'));
         });
     }
 
     function deletePage(id) {
-        if (!confirm('Are you sure you want to delete this page?')) return;
+        if (!confirm('Are you sure you want to delete this page? This will also delete all its content.')) return;
 
         fetch(`/api/pages/${id}`, {
             method: 'DELETE',
@@ -156,12 +203,17 @@
                 'Authorization': 'Basic ' + btoa('admin:admin')
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
             location.reload();
         })
         .catch(error => {
-            alert('Error deleting page: ' + error);
+            alert('Error deleting page: ' + (error.detail || 'Unknown error'));
         });
     }
 </script>

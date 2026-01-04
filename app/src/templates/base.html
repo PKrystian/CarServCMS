@@ -76,12 +76,17 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="/" class="nav-item nav-link {% if request.url.path == '/' %}active{% endif %}">Home</a>
-                <a href="/about" class="nav-item nav-link {% if request.url.path == '/about' %}active{% endif %}">About</a>
-                <a href="/services" class="nav-item nav-link {% if request.url.path == '/services' %}active{% endif %}">Services</a>
-                <a href="/team" class="nav-item nav-link {% if request.url.path == '/team' %}active{% endif %}">Team</a>
-                <a href="/testimonials" class="nav-item nav-link {% if request.url.path == '/testimonials' %}active{% endif %}">Testimonials</a>
-                <a href="/contact" class="nav-item nav-link {% if request.url.path == '/contact' %}active{% endif %}">Contact</a>
+                {% if all_pages %}
+                    {% for page in all_pages %}
+                        {% if page.slug == 'home' %}
+                            <a href="/" class="nav-item nav-link {% if request.url.path == '/' %}active{% endif %}">{{ page.name }}</a>
+                        {% else %}
+                            <a href="/page/{{ page.slug }}" class="nav-item nav-link {% if '/page/' + page.slug in request.url.path %}active{% endif %}">{{ page.name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <a href="/" class="nav-item nav-link {% if request.url.path == '/' %}active{% endif %}">Home</a>
+                {% endif %}
             </div>
             <a href="/admin" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Admin Panel<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
