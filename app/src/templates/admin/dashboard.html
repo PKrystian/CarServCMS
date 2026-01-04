@@ -1,0 +1,79 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <!-- Dashboard Content Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-6 col-xl-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-file fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Pages</p>
+                        <h6 class="mb-0">{{ stats.pages }}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-align-left fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Content Items</p>
+                        <h6 class="mb-0">{{ stats.content }}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-cog fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Settings</p>
+                        <h6 class="mb-0">{{ stats.settings }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="/admin/pages" class="btn btn-primary w-100 py-3">
+                        <i class="fa fa-file me-2"></i>Manage Pages
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/admin/settings" class="btn btn-primary w-100 py-3">
+                        <i class="fa fa-cog me-2"></i>Edit Settings
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/" class="btn btn-outline-primary w-100 py-3">
+                        <i class="fa fa-globe me-2"></i>View Website
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary rounded p-4">
+            <h6 class="mb-4">Welcome to CarServ CMS Admin Panel</h6>
+            <p>This Content Management System allows you to:</p>
+            <ul>
+                <li><strong>Manage Pages:</strong> Create, edit, and delete pages for your website</li>
+                <li><strong>Edit Content:</strong> Modify text, images, and other content on each page</li>
+                <li><strong>Update Settings:</strong> Change site-wide settings like contact information, social media links, and more</li>
+            </ul>
+            <div class="alert alert-primary" role="alert">
+                <i class="fa fa-info-circle me-2"></i>
+                All changes you make will be immediately visible on the live website.
+            </div>
+        </div>
+    </div>
+    <!-- Dashboard Content End -->
+{% endblock %}
+

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% endblock %}
+    <!-- Fact End -->
+    </div>
+        </div>
+            </div>
+                </div>
+                    <p class="text-white mb-0">Complete Projects</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ settings.stats_projects }}</h2>
+                    <i class="fa fa-car fa-2x text-white mb-3"></i>
+                <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.7s">
+                </div>
+                    <p class="text-white mb-0">Satisfied Clients</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ settings.stats_clients }}</h2>
+                    <i class="fa fa-users fa-2x text-white mb-3"></i>
+                <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.5s">
+                </div>
+                    <p class="text-white mb-0">Expert Technicians</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ settings.stats_technicians }}</h2>
+                    <i class="fa fa-users-cog fa-2x text-white mb-3"></i>
+                <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.3s">
+                </div>
+                    <p class="text-white mb-0">Years Experience</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ settings.stats_experience }}</h2>
+                    <i class="fa fa-check fa-2x text-white mb-3"></i>
+                <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.1s">
+            <div class="row g-4">
+        <div class="container">
+    <div class="container-fluid fact bg-dark my-5 py-5">
+    <!-- Fact Start -->
+
+    <!-- About End -->
+    </div>
+        </div>
+            </div>
+                </div>
+                    </div>
+                        {% endfor %}
+                        </div>
+                            </div>
+                                </div>
+                                    <span>{{ point.content }}</span>
+                                    <h6>{{ point.title }}</h6>
+                                <div class="ps-3">
+                                </div>
+                                    <span class="fw-bold text-secondary">0{{ loop.index }}</span>
+                                <div class="bg-light d-flex flex-shrink-0 align-items-center justify-content-center mt-1" style="width: 45px; height: 45px;">
+                            <div class="d-flex">
+                        <div class="col-12 wow fadeIn" data-wow-delay="{{ loop.index * 0.2 - 0.1 }}s">
+                        {% for point in content.about_points %}
+                    <div class="row g-4 mb-3 pb-3">
+                    {% endif %}
+                    <p class="mb-4">{{ content.about.content }}</p>
+                    <h1 class="mb-4"><span class="text-primary">{{ content.about.title }}</span></h1>
+                    {% if content.about %}
+                    {% endif %}
+                    <h6 class="text-primary text-uppercase">{{ content.header.title }}</h6>
+                    {% if content.header %}
+                <div class="col-lg-6">
+                </div>
+                    </div>
+                        </div>
+                            <h4 class="text-white">Experience</h4>
+                            <h1 class="display-4 text-white mb-0">{{ settings.years_experience }} <span class="fs-4">Years</span></h1>
+                        <div class="position-absolute top-0 end-0 mt-n4 me-n4 py-4 px-5" style="background: rgba(0, 0, 0, .08);">
+                        <img class="position-absolute img-fluid w-100 h-100" src="/static/carserv-1.0.0/carserv-1.0.0/img/about.jpg" style="object-fit: cover;" alt="">
+                    <div class="position-relative h-100 wow fadeIn" data-wow-delay="0.1s">
+                <div class="col-lg-6 pt-4" style="min-height: 400px;">
+            <div class="row g-5">
+        <div class="container">
+    <div class="container-xxl py-5">
+    <!-- About Start -->
+
+    <!-- Page Header End -->
+    </div>
+        </div>
+            </div>
+                </nav>
+                    </ol>
+                        <li class="breadcrumb-item text-white active" aria-current="page">About</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <ol class="breadcrumb justify-content-center text-uppercase">
+                <nav aria-label="breadcrumb">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">About Us</h1>
+            <div class="container text-center">
+        <div class="container-fluid page-header-inner py-5">
+    <div class="container-fluid page-header mb-5 p-0" style="background-image: url(/static/carserv-1.0.0/carserv-1.0.0/img/carousel-bg-1.jpg);">
+    <!-- Page Header Start -->
+{% block content %}
+
+

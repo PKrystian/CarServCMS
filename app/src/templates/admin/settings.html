@@ -1,0 +1,193 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <!-- Settings Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Site Settings</h6>
+            </div>
+
+            <div class="alert alert-info" role="alert">
+                <i class="fa fa-info-circle me-2"></i>
+                These settings control site-wide values like contact information, social media links, and statistics.
+            </div>
+
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-white">
+                            <th scope="col">Setting Key</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setting in settings %}
+                        <tr>
+                            <td><strong>{{ setting.reference_key }}</strong></td>
+                            <td>{{ (setting.value[:100] + '...') if setting.value|length > 100 else setting.value }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editSetting({{ setting.id }}, '{{ setting.reference_key }}', `{{ setting.value }}`)">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSettingModal">
+                    <i class="fa fa-plus me-2"></i>Add New Setting
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Common Settings -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="bg-secondary rounded p-4">
+                    <h6 class="mb-3">Contact Information</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Address:</strong> {{ settings | selectattr('reference_key', 'equalto', 'contact_address') | map(attribute='value') | first }}</li>
+                        <li class="mb-2"><strong>Phone:</strong> {{ settings | selectattr('reference_key', 'equalto', 'contact_phone') | map(attribute='value') | first }}</li>
+                        <li class="mb-2"><strong>Email:</strong> {{ settings | selectattr('reference_key', 'equalto', 'contact_email') | map(attribute='value') | first }}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-secondary rounded p-4">
+                    <h6 class="mb-3">Social Media</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Facebook:</strong> {{ settings | selectattr('reference_key', 'equalto', 'facebook_url') | map(attribute='value') | first }}</li>
+                        <li class="mb-2"><strong>Twitter:</strong> {{ settings | selectattr('reference_key', 'equalto', 'twitter_url') | map(attribute='value') | first }}</li>
+                        <li class="mb-2"><strong>Instagram:</strong> {{ settings | selectattr('reference_key', 'equalto', 'instagram_url') | map(attribute='value') | first }}</li>
+                        <li class="mb-2"><strong>LinkedIn:</strong> {{ settings | selectattr('reference_key', 'equalto', 'linkedin_url') | map(attribute='value') | first }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Settings End -->
+
+    <!-- Edit Setting Modal -->
+    <div class="modal fade" id="editSettingModal" tabindex="-1" aria-labelledby="editSettingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-secondary">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSettingModalLabel">Edit Setting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSettingForm">
+                        <input type="hidden" id="editSettingId">
+                        <div class="mb-3">
+                            <label for="editSettingKey" class="form-label">Setting Key</label>
+                            <input type="text" class="form-control" id="editSettingKey" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSettingValue" class="form-label">Value</label>
+                            <textarea class="form-control" id="editSettingValue" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateSetting()">Update Setting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Setting Modal -->
+    <div class="modal fade" id="addSettingModal" tabindex="-1" aria-labelledby="addSettingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-secondary">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSettingModalLabel">Add New Setting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSettingForm">
+                        <div class="mb-3">
+                            <label for="settingKey" class="form-label">Setting Key</label>
+                            <input type="text" class="form-control" id="settingKey" required>
+                            <small class="form-text text-muted">Use lowercase with underscores, e.g., "contact_phone"</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="settingValue" class="form-label">Value</label>
+                            <textarea class="form-control" id="settingValue" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addSetting()">Add Setting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function editSetting(id, key, value) {
+        document.getElementById('editSettingId').value = id;
+        document.getElementById('editSettingKey').value = key;
+        document.getElementById('editSettingValue').value = value;
+        new bootstrap.Modal(document.getElementById('editSettingModal')).show();
+    }
+
+    function updateSetting() {
+        const id = document.getElementById('editSettingId').value;
+        const value = document.getElementById('editSettingValue').value;
+        if (!value) return;
+
+        fetch(`/api/settings/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + btoa('admin:admin')
+            },
+            body: JSON.stringify({ value: value })
+        })
+        .then(response => response.json())
+        .then(data => {
+            location.reload();
+        })
+        .catch(error => {
+            alert('Error updating setting: ' + error);
+        });
+    }
+
+    function addSetting() {
+        const key = document.getElementById('settingKey').value;
+        const value = document.getElementById('settingValue').value;
+        if (!key || !value) return;
+
+        fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + btoa('admin:admin')
+            },
+            body: JSON.stringify({
+                reference_key: key,
+                value: value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            location.reload();
+        })
+        .catch(error => {
+            alert('Error adding setting: ' + error);
+        });
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header mb-5 p-0" style="background-image: url(/static/carserv-1.0.0/carserv-1.0.0/img/carousel-bg-1.jpg);">
+        <div class="container-fluid page-header-inner py-5">
+            <div class="container text-center">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">Our Team</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center text-uppercase">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Team</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Team Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                {% if content.header %}
+                <h6 class="text-primary text-uppercase">{{ content.header.title }}</h6>
+                <h1 class="mb-5">{{ content.header.content }}</h1>
+                {% endif %}
+            </div>
+            <div class="row g-4">
+                {% for member in content.team_members %}
+                {% set parts = member.content.split('||') %}
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ loop.index * 0.2 - 0.1 }}s">
+                    <div class="team-item">
+                        <div class="position-relative overflow-hidden">
+                            <img class="img-fluid" src="/static/carserv-1.0.0/carserv-1.0.0/{{ parts[1] if parts|length > 1 else 'img/team-1.jpg' }}" alt="{{ member.title }}">
+                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100">
+                                {% if parts|length > 2 %}
+                                <a class="btn btn-square mx-1" href="{{ parts[2] }}"><i class="fab fa-facebook-f"></i></a>
+                                {% endif %}
+                                {% if parts|length > 3 %}
+                                <a class="btn btn-square mx-1" href="{{ parts[3] }}"><i class="fab fa-twitter"></i></a>
+                                {% endif %}
+                                {% if parts|length > 4 %}
+                                <a class="btn btn-square mx-1" href="{{ parts[4] }}"><i class="fab fa-instagram"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="bg-light text-center p-4">
+                            <h5 class="fw-bold mb-0">{{ member.title }}</h5>
+                            <small>{{ parts[0] if parts|length > 0 else 'Technician' }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Team End -->
+{% endblock %}
+
