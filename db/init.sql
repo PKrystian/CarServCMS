@@ -20,7 +20,7 @@ CREATE TABLE users (
 CREATE TABLE settings (
     id BIGSERIAL PRIMARY KEY,
     reference_key VARCHAR(255) NOT NULL,
-    hash TEXT NOT NULL,
+    value TEXT NOT NULL,
     added_by BIGINT REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     modified_by BIGINT REFERENCES users(id),
@@ -63,35 +63,113 @@ CREATE TABLE translations (
     modified_at TIMESTAMP
 );
 
--- Seed Users
+-- Seed Users (password: admin, editor, viewer - hashed with bcrypt)
 INSERT INTO users (username, password_hash, role) VALUES
-('admin', 'admin_hash_123', 'admin'),
-('editor', 'editor_hash_456', 'editor'),
-('viewer', 'viewer_hash_789', 'viewer');
+('admin', '$2b$12$r2kXcGXkML843/gNLnCbVumbXV5lNalec/4Ly1p9TERdIzwUCzLhy', 'admin'),
+('editor', '$2b$12$SqMhJCQ5LVoUF.cXCYXB5O9bzUEeB/ORbCcFJoFtmVdQzuvT36.K.', 'editor'),
+('viewer', '$2b$12$La5OlsMGX9YlR7k9Ow.XL.Tvd2uNE5CM2vok.2TlpT0ttlGeVok5K', 'viewer');
 
 -- Seed Settings
-INSERT INTO settings (hash, added_by) VALUES
-('site_title_hash', 1),
-('theme_dark_hash', 1),
-('maintenance_mode_hash', 1);
+INSERT INTO settings (reference_key, value, added_by) VALUES
+('site_title', 'CarServ - Car Repair Service Center', 1),
+('site_logo', '<i class="fa fa-car me-3"></i>CarServ', 1),
+('contact_address', '123 Street, New York, USA', 1),
+('contact_phone', '+012 345 6789', 1),
+('contact_email', 'info@carserv.com', 1),
+('opening_hours_weekday', 'Mon - Fri : 09.00 AM - 09.00 PM', 1),
+('opening_hours_weekend', 'Sat - Sun : 09.00 AM - 12.00 PM', 1),
+('facebook_url', 'https://facebook.com', 1),
+('twitter_url', 'https://twitter.com', 1),
+('linkedin_url', 'https://linkedin.com', 1),
+('instagram_url', 'https://instagram.com', 1),
+('years_experience', '15', 1),
+('stats_experience', '1234', 1),
+('stats_technicians', '1234', 1),
+('stats_clients', '1234', 1),
+('stats_projects', '1234', 1);
 
 -- Seed Pages
 INSERT INTO pages (name, added_by) VALUES
 ('Home', 1),
 ('About', 1),
-('Contact', 1);
+('Services', 1),
+('Contact', 1),
+('Team', 1),
+('Testimonials', 1),
+('Booking', 1);
 
--- Seed ContentItems
+-- Seed ContentItems for Home Page
 INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
-(1, 1, 'Welcome', 'Welcome to our car service CMS.', 'text', 1),
-(2, 1, 'Our Story', 'We started in 2020...', 'text', 2),
-(3, 1, 'Contact Info', 'Email us at contact@carserv.com', 'contact_form', 1);
+-- Carousel Items
+(1, 1, 'Qualified Car Repair Service Center', '// Car Servicing //', 'carousel', 1),
+(1, 2, 'Qualified Car Wash Service Center', '// Car Servicing //', 'carousel', 1),
+
+-- Service Features (top section)
+(1, 3, 'Quality Servicing', 'Diam dolor diam ipsum sit amet diam et eos erat ipsum', 'feature', 1),
+(1, 4, 'Expert Workers', 'Diam dolor diam ipsum sit amet diam et eos erat ipsum', 'feature', 1),
+(1, 5, 'Modern Equipment', 'Diam dolor diam ipsum sit amet diam et eos erat ipsum', 'feature', 1),
+
+-- About Section
+(1, 6, 'CarServ Is The Best Place For Your Auto Care', 'Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet', 'about', 1),
+(1, 7, 'Professional & Expert', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1),
+(1, 8, 'Quality Servicing Center', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1),
+(1, 9, 'Awards Winning Workers', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1),
+
+-- Booking Section
+(1, 10, 'Certified and Award Winning Car Repair Service Provider', 'Eirmod sed tempor lorem ut dolores. Aliquyam sit sadipscing kasd ipsum. Dolor ea et dolore et at sea ea at dolor, justo ipsum duo rebum sea invidunt voluptua. Eos vero eos vero ea et dolore eirmod et. Dolores diam duo invidunt lorem. Elitr ut dolores magna sit. Sea dolore sanctus sed et. Takimata takimata sanctus sed.', 'booking_info', 1);
+
+-- Seed ContentItems for About Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(2, 1, '// About Us //', 'About Us', 'page_header', 1),
+(2, 2, 'CarServ Is The Best Place For Your Auto Care', 'Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet', 'about', 1),
+(2, 3, 'Professional & Expert', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1),
+(2, 4, 'Quality Servicing Center', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1),
+(2, 5, 'Awards Winning Workers', 'Diam dolor diam ipsum sit amet diam et eos', 'about_point', 1);
+
+-- Seed ContentItems for Services Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(3, 1, '// Our Services //', 'Explore Our Services', 'page_header', 1),
+(3, 2, 'Diagnostic Test', '15 Years Of Experience In Auto Servicing||Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet||Quality Servicing||Expert Workers||Modern Equipment||img/service-1.jpg', 'service', 1),
+(3, 3, 'Engine Servicing', '15 Years Of Experience In Auto Servicing||Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet||Quality Servicing||Expert Workers||Modern Equipment||img/service-2.jpg', 'service', 1),
+(3, 4, 'Tires Replacement', '15 Years Of Experience In Auto Servicing||Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet||Quality Servicing||Expert Workers||Modern Equipment||img/service-3.jpg', 'service', 1),
+(3, 5, 'Oil Changing', '15 Years Of Experience In Auto Servicing||Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet||Quality Servicing||Expert Workers||Modern Equipment||img/service-4.jpg', 'service', 1);
+
+-- Seed ContentItems for Contact Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(4, 1, '// Contact Us //', 'Contact For Any Query', 'page_header', 1),
+(4, 2, 'Get In Touch', 'Contact us for any questions or inquiries about our services', 'contact_intro', 1);
+
+-- Seed ContentItems for Team Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(5, 1, '// Our Technicians //', 'Our Expert Technicians', 'page_header', 1),
+(5, 2, 'John Smith', 'Master Technician||img/team-1.jpg||https://facebook.com||https://twitter.com||https://instagram.com', 'team_member', 1),
+(5, 3, 'Sarah Johnson', 'Engine Specialist||img/team-2.jpg||https://facebook.com||https://twitter.com||https://instagram.com', 'team_member', 1),
+(5, 4, 'Mike Wilson', 'Senior Mechanic||img/team-3.jpg||https://facebook.com||https://twitter.com||https://instagram.com', 'team_member', 1),
+(5, 5, 'David Brown', 'Diagnostic Expert||img/team-4.jpg||https://facebook.com||https://twitter.com||https://instagram.com', 'team_member', 1);
+
+-- Seed ContentItems for Testimonials Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(6, 1, '// Testimonial //', 'Our Clients Say!', 'page_header', 1),
+(6, 2, 'Robert Johnson', 'Business Owner||Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam amet diam et eos. Clita erat ipsum et lorem et sit.||img/testimonial-1.jpg', 'testimonial', 1),
+(6, 3, 'Maria Garcia', 'Software Engineer||Excellent service! My car runs like new after their maintenance work. Highly professional team.||img/testimonial-2.jpg', 'testimonial', 1),
+(6, 4, 'James Wilson', 'Teacher||Best car service in town. They are honest, efficient, and their prices are very reasonable.||img/testimonial-3.jpg', 'testimonial', 1),
+(6, 5, 'Lisa Anderson', 'Entrepreneur||I trust them with all my vehicles. Great customer service and quality work every time.||img/testimonial-4.jpg', 'testimonial', 1);
+
+-- Seed ContentItems for Booking Page
+INSERT INTO content_items (page_id, position, title, content, content_type, added_by) VALUES
+(7, 1, '// Booking //', 'Book A Service', 'page_header', 1),
+(7, 2, 'Book For A Service', 'Fill out the form below to schedule your service appointment', 'booking_form', 1);
 
 -- Seed Translations
 INSERT INTO translations (reference_key, language, text, added_by) VALUES
-('welcome_msg', 'en', 'Welcome', 1),
-('welcome_msg', 'pl', 'Witamy', 1),
-('contact_btn', 'en', 'Contact Us', 1);
+('nav_home', 'en', 'Home', 1),
+('nav_about', 'en', 'About', 1),
+('nav_services', 'en', 'Services', 1),
+('nav_contact', 'en', 'Contact', 1),
+('btn_get_quote', 'en', 'Get A Quote', 1),
+('btn_learn_more', 'en', 'Learn More', 1),
+('btn_read_more', 'en', 'Read More', 1),
+('btn_book_now', 'en', 'Book Now', 1);
 
 -- Create Admin DB User (as requested previously)
 DO
